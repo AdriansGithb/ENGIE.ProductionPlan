@@ -24,9 +24,8 @@ namespace ProductionPlan.Api.Controllers
         {
             try
             {
-                _logger.LogInformation("Post payload reached !");
-                throw new NotImplementedException();
-                //return _productionService.PlanProduction(payload);
+                _logger.LogInformation("Post payload reached!");
+                return Ok(_productionService.PlanProduction(payload));
             }
             catch (Exception ex)
             {

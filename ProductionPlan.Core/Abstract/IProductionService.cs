@@ -9,5 +9,6 @@ namespace ProductionPlan.Core.Abstract
 {
     public interface IProductionService
     {
+        IEnumerable<PlannedProductionPowerplant> PlanProduction(Payload payload);
     }
 }

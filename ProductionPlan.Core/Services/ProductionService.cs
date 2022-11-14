@@ -19,7 +19,7 @@ namespace ProductionPlan.Core.Services
             _logger.LogDebug(1, "NLog injected into ProductionService");
         }
 
-        public void PlanProduction(Payload payload)
+        public IEnumerable<PlannedProductionPowerplant> PlanProduction(Payload payload)
         {
             try
             {
@@ -27,6 +27,7 @@ namespace ProductionPlan.Core.Services
                 // créer un powerplant pour le calcul de prod
                 // si le load est supérieur au max : renvoyer tout au max
                 // sinon calculer le load
+                throw new NotImplementedException();
             }
             catch (Exception ex)
             {

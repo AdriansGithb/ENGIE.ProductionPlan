@@ -23,16 +23,44 @@ namespace ProductionPlan.Core.Services
         {
             try
             {
-                // créer un response powerplant
-                // créer un powerplant pour le calcul de prod
+                if (payload.Powerplants is null || payload.Powerplants.Count() == 0)
+                {
+                    _logger.LogInformation("Return empty list because of empty powerplants list received");
+                    return new List<PlannedProductionPowerplant>();
+                }
+
+                var target = (decimal)payload.Load.Amount;
+                if(target < 0)
+                {
+                    _logger.LogError("Received load is less than 0.");
+                     throw new ArgumentException("Payload is less than zero.");
+               }
+
+
+
+                if( target >= payload.Powerplants.Sum(pwp => pwp.PMax))
+                {
+
+                }
+
                 // si le load est supérieur au max : renvoyer tout au max
                 // sinon calculer le load
                 throw new NotImplementedException();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 throw ex;
             }
+        }
+
+        private IEnumerable<PlannedProductionPowerplant> PlanMaximalProduction(List<Powerplant>)
+        {
+            throw new NotImplementedException();
+        }
+        private IEnumerable<PowerGenerationUnit> ToPowerGenerationUnits(List<Powerplant>)
+        {
+            throw new NotImplementedException();
         }
     }
 }

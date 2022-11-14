@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using ProductionPlan.Core.Abstract;
+using ProductionPlan.Core.Mappers;
 using ProductionPlan.Core.Models;
+using ProductionPlan.Core.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,16 +38,27 @@ namespace ProductionPlan.Core.Services
                      throw new ArgumentException("Payload is less than zero.");
                }
 
+                var powerUnits = GetPowerGenerationUnits(payload);
 
-
-                if( target >= payload.Powerplants.Sum(pwp => pwp.PMax))
+                // target load is higher than max producible power
+                if( target > powerUnits.Sum(pu => pu.PMax))
                 {
-
+                    _logger.LogError("Target load is higher than maximum producible power");
+                    return PlanMaximalProduction(powerUnits);
                 }
-
-                // si le load est supérieur au max : renvoyer tout au max
-                // sinon calculer le load
-                throw new NotImplementedException();
+                //target load is equal to max producible power
+                else if( target == powerUnits.Sum(pu => pu.PMax))
+                {
+                    _logger.LogInformation("Target load is equal to maximum producible power");
+                    return PlanMaximalProduction(powerUnits);
+                }
+                //target load is equal to max producible power
+                else
+                {
+                    _logger.LogInformation("Target load is less than maximum producible power");
+                    return PlanProductionByMeritOrder(powerUnits, target);
+                }
+                
             }
             catch (Exception ex)
             {
@@ -54,13 +67,89 @@ namespace ProductionPlan.Core.Services
             }
         }
 
-        private IEnumerable<PlannedProductionPowerplant> PlanMaximalProduction(List<Powerplant>)
+
+        private IEnumerable<PlannedProductionPowerplant> PlanProductionByMeritOrder(List<PowerGenerationUnit> powerGenerationUnits, decimal target)
         {
-            throw new NotImplementedException();
+            // sortir les productions nulles
+
+            //sort list by merit order
+            powerGenerationUnits = powerGenerationUnits.OrderBy(item => item.ProductionCostPerUnit).ThenBy(item => item.PMin).ThenByDescending(item => item.PMax).ToList();
+            //get full possible combinations list
+            var possibleCombinations = (from combination in GetAllPossibleCombinations(powerGenerationUnits)
+                          where combination.Sum(c => c.PMax) >= target && combination.Sum(c => c.PMin) <= target
+                          select combination.ToList()).ToList();
+
+            return GetBestPossibleCombination(possibleCombinations, target).Select(pu => pu.ToPlannedProductionPowerplant());
+
         }
-        private IEnumerable<PowerGenerationUnit> ToPowerGenerationUnits(List<Powerplant>)
+        private IEnumerable<PlannedProductionPowerplant> PlanMaximalProduction(List<PowerGenerationUnit> powerGenerationUnits)
         {
-            throw new NotImplementedException();
+            List<PlannedProductionPowerplant> plannedProcutionList = new List<PlannedProductionPowerplant>();
+            foreach (var unit in powerGenerationUnits)
+            {
+                unit.AdvisedProduction = unit.PMax;
+                plannedProcutionList.Add(unit.ToPlannedProductionPowerplant());
+            }
+            return plannedProcutionList;
         }
+        private List<PowerGenerationUnit> GetPowerGenerationUnits(Payload payload)
+        {
+            List<PowerGenerationUnit> units = new List<PowerGenerationUnit>();
+            foreach(var pwp in payload.Powerplants)
+            {
+                var unit = pwp.Type switch
+                {
+                    PowerplantTypeEnum.windturbine => pwp.ToWindPowerGenerationUnit(payload.Fuels.Wind),
+                    PowerplantTypeEnum.gasfired => pwp.ToFuelPowerGenerationUnit(payload.Fuels.Gas),
+                    PowerplantTypeEnum.turbojet => pwp.ToFuelPowerGenerationUnit(payload.Fuels.Kerosine),
+                    _ => throw new ArgumentException($"Powerplant type not configured : {pwp.Type}")
+                };
+                units.Add(unit);
+            }
+            return units;
+        }
+
+        private IEnumerable<IEnumerable<PowerGenerationUnit>> GetAllPossibleCombinations(IEnumerable<PowerGenerationUnit> availablePowerUnits)
+        {
+            if (!availablePowerUnits.Any())
+                return Enumerable.Repeat(Enumerable.Empty<PowerGenerationUnit>(), 1);
+
+            var unit = availablePowerUnits.Take(1);
+            var nextUnits = GetAllPossibleCombinations(availablePowerUnits.Skip(1));
+            var possibleUnitsCombination = nextUnits.Select(set => unit.Concat(set));
+            return possibleUnitsCombination.Concat(nextUnits);
+        }
+
+        private List<PowerGenerationUnit> GetBestPossibleCombination(List<List<PowerGenerationUnit>> allPossibleCombinations, decimal target)
+        {
+            foreach (var combination in allPossibleCombinations)
+            {
+                var possibleCombination = new List<PowerGenerationUnit>();
+                var minMandatory = combination.Sum(x => x.PMin);
+                var tempTarget = target;
+                foreach(var powerUnit in combination)
+                {
+                    minMandatory -= Math.Round(powerUnit.PMin, 1, MidpointRounding.ToZero);
+                    decimal residue = Math.Round(tempTarget - minMandatory, 1, MidpointRounding.ToZero);
+                    decimal powerToUse = 0;
+                    if (Math.Round(powerUnit.PMax, 1, MidpointRounding.ToZero) >= residue)
+                        powerToUse = residue;
+                    else
+                        powerToUse = Math.Round(powerUnit.PMax, 1, MidpointRounding.ToZero);
+
+                    powerUnit.AdvisedProduction = powerToUse;
+                    tempTarget -= powerToUse;
+                }
+            }
+
+            return allPossibleCombinations
+                .OrderBy(combination => 
+                combination.Sum(pu => 
+                pu.AdvisedProduction * pu.ProductionCostPerUnit))
+                .First()
+                .ToList();
+        }
+
+
     }
 }

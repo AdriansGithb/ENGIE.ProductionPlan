@@ -52,7 +52,7 @@ namespace ProductionPlan.Core.Services
                     _logger.LogInformation("Target load is equal to maximum producible power");
                     return PlanMaximalProduction(powerUnits);
                 }
-                //target load is equal to max producible power
+                //target load is less than max producible power
                 else
                 {
                     _logger.LogInformation("Target load is less than maximum producible power");
@@ -71,7 +71,8 @@ namespace ProductionPlan.Core.Services
         private IEnumerable<PlannedProductionPowerplant> PlanProductionByMeritOrder(List<PowerGenerationUnit> powerGenerationUnits, decimal target)
         {
             // sortir les productions nulles
-
+            var nullPowerGenerationUnits = powerGenerationUnits.Where(pu => pu.PMax == 0).ToList();
+            powerGenerationUnits.RemoveAll(pu => pu.PMax == 0);
             //sort list by merit order
             powerGenerationUnits = powerGenerationUnits.OrderBy(item => item.ProductionCostPerUnit).ThenBy(item => item.PMin).ThenByDescending(item => item.PMax).ToList();
             //get full possible combinations list
@@ -79,7 +80,10 @@ namespace ProductionPlan.Core.Services
                           where combination.Sum(c => c.PMax) >= target && combination.Sum(c => c.PMin) <= target
                           select combination.ToList()).ToList();
 
-            return GetBestPossibleCombination(possibleCombinations, target).Select(pu => pu.ToPlannedProductionPowerplant());
+            var bestPowerGeneration = GetBestPossibleCombination(possibleCombinations, target).ToList();
+            if (nullPowerGenerationUnits != null && nullPowerGenerationUnits.Count > 0)
+                bestPowerGeneration.AddRange(nullPowerGenerationUnits);
+            return bestPowerGeneration.Select(pu => pu.ToPlannedProductionPowerplant());
 
         }
         private IEnumerable<PlannedProductionPowerplant> PlanMaximalProduction(List<PowerGenerationUnit> powerGenerationUnits)

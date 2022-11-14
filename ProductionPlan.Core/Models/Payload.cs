@@ -9,7 +9,7 @@ namespace ProductionPlan.Core.Models
     public class Payload
     {
         public Load Load { get; set; }
-        public IEnumerable<Fuel> Fuels { get; set; }
+        public Fuel Fuels { get; set; }
         public IEnumerable<Powerplant> Powerplants { get; set; }
     }
 }

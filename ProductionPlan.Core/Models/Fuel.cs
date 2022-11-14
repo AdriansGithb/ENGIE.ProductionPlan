@@ -9,7 +9,9 @@ namespace ProductionPlan.Core.Models
 {
     public class Fuel
     {
-        public FuelTypeEnum Type { get; set; }
-        public float Amount { get; set; }
+        public decimal Gas { get; set; }
+        public decimal Kerosine { get; set; }
+        public decimal Co2 { get; set; }
+        public decimal Wind { get; set; }
     }
 }

@@ -10,10 +10,13 @@ namespace ProductionPlan.Api.Controllers
     public class ProductionPlanController : ControllerBase
     {
         private readonly IProductionService _productionService;
+        private readonly ILogger<ProductionPlanController> _logger;
 
-        public ProductionPlanController(IProductionService productionService)
+        public ProductionPlanController(IProductionService productionService, ILogger<ProductionPlanController> logger)
         {
             _productionService = productionService;
+            _logger = logger;
+            _logger.LogDebug(1, "NLog injected into HomeController");
         }
 
         [HttpPost]
@@ -21,6 +24,7 @@ namespace ProductionPlan.Api.Controllers
         {
             try
             {
+                _logger.LogInformation("Post payload reached !");
                 throw new NotImplementedException();
                 //return _productionService.PlanProduction(payload);
             }

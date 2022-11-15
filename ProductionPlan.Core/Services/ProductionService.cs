@@ -31,7 +31,7 @@ namespace ProductionPlan.Core.Services
                     return new List<PlannedProductionPowerplant>();
                 }
 
-                var target = (decimal)payload.Load.Amount;
+                var target = (decimal)payload.Load;
                 if(target < 0)
                 {
                     _logger.LogError("Received load is less than 0.");
@@ -70,20 +70,31 @@ namespace ProductionPlan.Core.Services
 
         private IEnumerable<PlannedProductionPowerplant> PlanProductionByMeritOrder(List<PowerGenerationUnit> powerGenerationUnits, decimal target)
         {
-            // sortir les productions nulles
-            var nullPowerGenerationUnits = powerGenerationUnits.Where(pu => pu.PMax == 0).ToList();
-            powerGenerationUnits.RemoveAll(pu => pu.PMax == 0);
-            //sort list by merit order
-            powerGenerationUnits = powerGenerationUnits.OrderBy(item => item.ProductionCostPerUnit).ThenBy(item => item.PMin).ThenByDescending(item => item.PMax).ToList();
-            //get full possible combinations list
-            var possibleCombinations = (from combination in GetAllPossibleCombinations(powerGenerationUnits)
+            //sort list by merit order 
+            powerGenerationUnits = powerGenerationUnits
+                .OrderBy(item => item.ProductionCostPerUnit).ThenBy(item => item.PMin).ThenByDescending(item => item.PMax).ToList();
+            //get full possible combinations list and do not take power units with 0 producible power
+            var possibleCombinations = (from combination in GetAllPossibleCombinations(powerGenerationUnits.Where(pu => pu.PMax > 0))
                           where combination.Sum(c => c.PMax) >= target && combination.Sum(c => c.PMin) <= target
                           select combination.ToList()).ToList();
 
+            //clone objects
+            for (int i = 0; i < possibleCombinations.Count; i++)
+            {
+                for (int j = 0; j < possibleCombinations[i].Count; j++)
+                {
+                    var clone = possibleCombinations[i][j].DeepCopy();
+                    possibleCombinations[i][j] = clone;
+                }
+            }
+
             var bestPowerGeneration = GetBestPossibleCombination(possibleCombinations, target).ToList();
-            if (nullPowerGenerationUnits != null && nullPowerGenerationUnits.Count > 0)
-                bestPowerGeneration.AddRange(nullPowerGenerationUnits);
-            return bestPowerGeneration.Select(pu => pu.ToPlannedProductionPowerplant());
+            foreach(var powerGenerationUnit in powerGenerationUnits)
+            {
+                var computedUnit = bestPowerGeneration.FirstOrDefault(pu => pu.Name.Equals(powerGenerationUnit.Name));
+                powerGenerationUnit.AdvisedProduction = computedUnit is null ? 0 : computedUnit.AdvisedProduction;
+            }
+            return powerGenerationUnits.Select(pu => pu.ToPlannedProductionPowerplant());
 
         }
         private IEnumerable<PlannedProductionPowerplant> PlanMaximalProduction(List<PowerGenerationUnit> powerGenerationUnits)
@@ -121,7 +132,7 @@ namespace ProductionPlan.Core.Services
             var unit = availablePowerUnits.Take(1);
             var nextUnits = GetAllPossibleCombinations(availablePowerUnits.Skip(1));
             var possibleUnitsCombination = nextUnits.Select(set => unit.Concat(set));
-            return possibleUnitsCombination.Concat(nextUnits);
+            return possibleUnitsCombination.Concat(nextUnits) ;
         }
 
         private List<PowerGenerationUnit> GetBestPossibleCombination(List<List<PowerGenerationUnit>> allPossibleCombinations, decimal target)
@@ -133,23 +144,45 @@ namespace ProductionPlan.Core.Services
                 var tempTarget = target;
                 foreach(var powerUnit in combination)
                 {
-                    minMandatory -= Math.Round(powerUnit.PMin, 1, MidpointRounding.ToZero);
-                    decimal residue = Math.Round(tempTarget - minMandatory, 1, MidpointRounding.ToZero);
+                    //minMandatory -= Math.Round(powerUnit.PMin, 1, MidpointRounding.ToZero);
+                    minMandatory -= powerUnit.PMin;
+                    decimal residue = tempTarget - minMandatory;
                     decimal powerToUse = 0;
-                    if (Math.Round(powerUnit.PMax, 1, MidpointRounding.ToZero) >= residue)
+                    if (powerUnit.PMax >= residue)
                         powerToUse = residue;
                     else
-                        powerToUse = Math.Round(powerUnit.PMax, 1, MidpointRounding.ToZero);
+                        powerToUse = powerUnit.PMax;
 
                     powerUnit.AdvisedProduction = powerToUse;
                     tempTarget -= powerToUse;
                 }
             }
 
+            //foreach (var list in allPossibleCombinations)
+            //{
+            //    Console.WriteLine($"Somme des couts : {list.Sum(pu => pu.AdvisedProduction * pu.ProductionCostPerUnit)}");
+            //    Console.WriteLine($"Somme des centrales dans la liste : {list.Count}");
+            //    Console.WriteLine($"Somme des centrales utilisées : {list.Count(powerUnit => powerUnit.AdvisedProduction > 0)}");
+            //}
+
+            //var res = allPossibleCombinations
+            //    .OrderBy(combination =>
+            //    combination.Sum(pu =>
+            //    pu.AdvisedProduction * pu.ProductionCostPerUnit))
+            //    .ThenBy(combination => combination.Count(powerUnit => powerUnit.AdvisedProduction > 0))
+            //    .First()
+            //    .ToList();
+            //// penser à ajouter un tri pour sélectionner le moins de centrales possible
+
+            //Console.WriteLine($"Cout de la combinaison sélectionnée : {res.Sum(pu => pu.AdvisedProduction * pu.ProductionCostPerUnit)}");
+            //Console.WriteLine($"Somme des centrales utilisées : {res.Count(powerUnit => powerUnit.AdvisedProduction > 0)}");
+            //Console.WriteLine($"Somme des centrales dans la liste : {res.Count()}");
+
             return allPossibleCombinations
-                .OrderBy(combination => 
-                combination.Sum(pu => 
+                .OrderBy(combination =>
+                combination.Sum(pu =>
                 pu.AdvisedProduction * pu.ProductionCostPerUnit))
+                .ThenBy(combination => combination.Count(powerUnit => powerUnit.AdvisedProduction > 0))
                 .First()
                 .ToList();
         }

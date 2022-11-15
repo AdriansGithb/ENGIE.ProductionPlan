@@ -17,8 +17,8 @@ namespace ProductionPlan.Core.Mappers
                 Name = powerplant.Name,
                 Type = powerplant.Type,
                 Efficiency = powerplant.Efficiency,
-                PMin = powerplant.PMin * powerplant.Efficiency * (wind / 100),
-                PMax = powerplant.PMax * powerplant.Efficiency * (wind / 100),
+                PMin = Math.Round(powerplant.PMin * powerplant.Efficiency * (wind / 100), 1, MidpointRounding.ToZero),
+                PMax = Math.Round(powerplant.PMax * powerplant.Efficiency * (wind / 100), 1, MidpointRounding.ToZero),
                 ProductionCostPerUnit = 0
             };
         }
@@ -30,8 +30,8 @@ namespace ProductionPlan.Core.Mappers
                 Name = powerplant.Name,
                 Type = powerplant.Type,
                 Efficiency = powerplant.Efficiency,
-                PMin = powerplant.PMin * powerplant.Efficiency,
-                PMax = powerplant.PMax * powerplant.Efficiency,
+                PMin = Math.Round(powerplant.PMin * powerplant.Efficiency, 1, MidpointRounding.ToZero),
+                PMax = Math.Round(powerplant.PMax * powerplant.Efficiency, 1, MidpointRounding.ToZero),
                 ProductionCostPerUnit = fuelPricePerMwh / powerplant.Efficiency
             };
         }

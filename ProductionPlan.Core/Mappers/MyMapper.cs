@@ -32,7 +32,7 @@ namespace ProductionPlan.Core.Mappers
                 Efficiency = powerplant.Efficiency,
                 PMin = powerplant.PMin * powerplant.Efficiency,
                 PMax = powerplant.PMax * powerplant.Efficiency,
-                ProductionCostPerUnit = fuelPricePerMwh * powerplant.Efficiency
+                ProductionCostPerUnit = fuelPricePerMwh / powerplant.Efficiency
             };
         }
 

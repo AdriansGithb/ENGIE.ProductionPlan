@@ -72,7 +72,7 @@ namespace ProductionPlan.Core.Services
         {
             //sort list by merit order 
             powerGenerationUnits = powerGenerationUnits
-                .OrderBy(item => item.ProductionCostPerUnit).ThenBy(item => item.PMin).ThenByDescending(item => item.PMax).ToList();
+                .OrderBy(item => item.ProductionCostPerMwh).ThenBy(item => item.PMin).ThenByDescending(item => item.PMax).ToList();
             //get full possible combinations list and do not take power units with 0 producible power
             var possibleCombinations = (from combination in GetAllPossibleCombinations(powerGenerationUnits.Where(pu => pu.PMax > 0))
                           where combination.Sum(c => c.PMax) >= target && combination.Sum(c => c.PMin) <= target
@@ -115,8 +115,8 @@ namespace ProductionPlan.Core.Services
                 var unit = pwp.Type switch
                 {
                     PowerplantTypeEnum.windturbine => pwp.ToWindPowerGenerationUnit(payload.Fuels.Wind),
-                    PowerplantTypeEnum.gasfired => pwp.ToFuelPowerGenerationUnit(payload.Fuels.Gas),
-                    PowerplantTypeEnum.turbojet => pwp.ToFuelPowerGenerationUnit(payload.Fuels.Kerosine),
+                    PowerplantTypeEnum.gasfired => pwp.ToFuelPowerGenerationUnit(payload.Fuels.Gas, payload.Fuels.Co2),
+                    PowerplantTypeEnum.turbojet => pwp.ToFuelPowerGenerationUnit(payload.Fuels.Kerosine, payload.Fuels.Co2),
                     _ => throw new ArgumentException($"Powerplant type not configured : {pwp.Type}")
                 };
                 units.Add(unit);
@@ -181,7 +181,7 @@ namespace ProductionPlan.Core.Services
             return allPossibleCombinations
                 .OrderBy(combination =>
                 combination.Sum(pu =>
-                pu.AdvisedProduction * pu.ProductionCostPerUnit))
+                pu.AdvisedProduction * pu.ProductionCostPerMwh))
                 .ThenBy(combination => combination.Count(powerUnit => powerUnit.AdvisedProduction > 0))
                 .First()
                 .ToList();

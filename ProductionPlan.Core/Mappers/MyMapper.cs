@@ -1,4 +1,5 @@
 ﻿using ProductionPlan.Core.Models;
+using ProductionPlan.Core.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +20,11 @@ namespace ProductionPlan.Core.Mappers
                 Efficiency = powerplant.Efficiency,
                 PMin = Math.Round(powerplant.PMin * powerplant.Efficiency * (wind / 100), 1, MidpointRounding.ToZero),
                 PMax = Math.Round(powerplant.PMax * powerplant.Efficiency * (wind / 100), 1, MidpointRounding.ToZero),
-                ProductionCostPerUnit = 0
+                ProductionCostPerMwh = 0
             };
         }
 
-        public static PowerGenerationUnit ToFuelPowerGenerationUnit(this Powerplant powerplant, decimal fuelPricePerMwh)
+        public static PowerGenerationUnit ToFuelPowerGenerationUnit(this Powerplant powerplant, decimal fuelPricePerMwh, decimal co2Price)
         {
             return new PowerGenerationUnit
             {
@@ -32,7 +33,11 @@ namespace ProductionPlan.Core.Mappers
                 Efficiency = powerplant.Efficiency,
                 PMin = Math.Round(powerplant.PMin * powerplant.Efficiency, 1, MidpointRounding.ToZero),
                 PMax = Math.Round(powerplant.PMax * powerplant.Efficiency, 1, MidpointRounding.ToZero),
-                ProductionCostPerUnit = fuelPricePerMwh / powerplant.Efficiency
+                ProductionCostPerMwh = powerplant.Type switch
+                {
+                    PowerplantTypeEnum.gasfired => (fuelPricePerMwh / powerplant.Efficiency) + (0.3M * co2Price),
+                    _ => fuelPricePerMwh / powerplant.Efficiency
+                },
             };
         }
 

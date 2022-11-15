@@ -16,7 +16,7 @@ namespace ProductionPlan.Core.Models
         public decimal PMin { get; set; }
         public decimal PMax { get; set; }
         public decimal AdvisedProduction { get; set; } = 0;
-        public decimal ProductionCostPerUnit { get; set; }
+        public decimal ProductionCostPerMwh { get; set; }
 
 
 

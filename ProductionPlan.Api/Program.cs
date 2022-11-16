@@ -1,11 +1,9 @@
 using FluentValidation;
-using Microsoft.AspNetCore.Identity;
 using NLog;
 using NLog.Web;
 using ProductionPlan.Api.Validators;
 using ProductionPlan.Core.Abstract;
 using ProductionPlan.Core.Services;
-using System;
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 logger.Debug("init main");

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FluentValidation.Validators;
 using ProductionPlan.Core.Models;
 
 namespace ProductionPlan.Api.Validators

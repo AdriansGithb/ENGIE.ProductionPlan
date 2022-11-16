@@ -3,12 +3,7 @@ using ProductionPlan.Core.Abstract;
 using ProductionPlan.Core.Mappers;
 using ProductionPlan.Core.Models;
 using ProductionPlan.Core.Models.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProductionPlan.Core.Services
 {
@@ -19,7 +14,9 @@ namespace ProductionPlan.Core.Services
         public ProductionService(ILogger<ProductionService> logger)
         {
             _logger = logger;
-            _logger.LogDebug(1, "NLog injected into ProductionService");
+            #region log
+            _logger.LogDebug(1, "NLog injected into ProductionService"); 
+            #endregion
         }
 
         public IEnumerable<PlannedProductionPowerplant> PlanProduction(Payload payload)
@@ -33,55 +30,45 @@ namespace ProductionPlan.Core.Services
                 }
 
                 var target = payload.Load;
-               // if(target < 0)
-               // {
-               //     //_logger.LogError("Received load is less than 0.");
-               //      throw new ArgumentException("Received load is less than zero");
-               //}
 
                 var powerUnits = GetPowerGenerationUnits(payload);
                 List<PlannedProductionPowerplant> plannedProcutionList = new List<PlannedProductionPowerplant>();
                 // target load is higher than max producible power
                 if( target > powerUnits.Sum(pu => pu.PMax))
-                {
-                    //_logger.LogError("Target load is higher than maximum producible power");
                     throw new ArgumentException("Target load is higher than maximum producible power");
-                }
+
                 //target load is equal to max producible power
                 else if( target == powerUnits.Sum(pu => pu.PMax))
                 {
-                    _logger.LogInformation("Target load is equal to maximum producible power : plan maximal production");
+                    #region log
+                    _logger.LogInformation("Target load is equal to maximum producible power : plan maximal production"); 
+                    #endregion
                     plannedProcutionList = PlanMaximalProduction(powerUnits).ToList();
                 }
                 //target load is less than max producible power
                 else
                 {
-                    _logger.LogInformation("Target load is less than maximum producible power : plan production by merit order");
+                    #region log
+                    _logger.LogInformation("Target load is less than maximum producible power : plan production by merit order"); 
+                    #endregion
                     plannedProcutionList = PlanProductionByMeritOrder(powerUnits, target).ToList();
                 }
 
                 if(plannedProcutionList is null || plannedProcutionList.Count == 0)
-                {
-                    //_logger.LogError("Planned production list is empty");
                     throw new ArgumentException("Planned production list is empty");
-                }
                 if(plannedProcutionList.Sum(pwplnt => pwplnt.P) != target)
-                {
-                    //_logger.LogError("Planned total amount of power to produce is not equal to expected load");
                     throw new ArgumentException("Planned total amount of power to produce is not equal to expected load");
-                }
                 if(plannedProcutionList.Count != payload.Powerplants.Count())
-                {
-                    //_logger.LogError("Powerplants count in Planned production list is not equal to powerplants count in received Payload");
                     throw new ArgumentException("Powerplants count in Planned production list is not equal to powerplants count in received Payload");
-                }
 
                 return plannedProcutionList;
 
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                #region log
+                _logger.LogError(ex.Message); 
+                #endregion
                 ExceptionDispatchInfo.Capture(ex).Throw();
                 throw;
             }
@@ -114,9 +101,12 @@ namespace ProductionPlan.Core.Services
                 var computedUnit = bestPowerGeneration.FirstOrDefault(pu => pu.Name.Equals(powerGenerationUnit.Name));
                 powerGenerationUnit.AdvisedProduction = computedUnit is null ? 0 : computedUnit.AdvisedProduction;
             }
+
+
             return powerGenerationUnits.Select(pu => pu.ToPlannedProductionPowerplant());
 
         }
+
         public IEnumerable<PlannedProductionPowerplant> PlanMaximalProduction(List<PowerGenerationUnit> powerGenerationUnits)
         {
             List<PlannedProductionPowerplant> plannedProcutionList = new List<PlannedProductionPowerplant>();
@@ -127,6 +117,7 @@ namespace ProductionPlan.Core.Services
             }
             return plannedProcutionList;
         }
+
         public List<PowerGenerationUnit> GetPowerGenerationUnits(Payload payload)
         {
             List<PowerGenerationUnit> units = new List<PowerGenerationUnit>();
@@ -176,26 +167,6 @@ namespace ProductionPlan.Core.Services
                     tempTarget -= powerToUse;
                 }
             }
-
-            //foreach (var list in allPossibleCombinations)
-            //{
-            //    Console.WriteLine($"Somme des couts : {list.Sum(pu => pu.AdvisedProduction * pu.ProductionCostPerUnit)}");
-            //    Console.WriteLine($"Somme des centrales dans la liste : {list.Count}");
-            //    Console.WriteLine($"Somme des centrales utilisées : {list.Count(powerUnit => powerUnit.AdvisedProduction > 0)}");
-            //}
-
-            //var res = allPossibleCombinations
-            //    .OrderBy(combination =>
-            //    combination.Sum(pu =>
-            //    pu.AdvisedProduction * pu.ProductionCostPerUnit))
-            //    .ThenBy(combination => combination.Count(powerUnit => powerUnit.AdvisedProduction > 0))
-            //    .First()
-            //    .ToList();
-            //// penser à ajouter un tri pour sélectionner le moins de centrales possible
-
-            //Console.WriteLine($"Cout de la combinaison sélectionnée : {res.Sum(pu => pu.AdvisedProduction * pu.ProductionCostPerUnit)}");
-            //Console.WriteLine($"Somme des centrales utilisées : {res.Count(powerUnit => powerUnit.AdvisedProduction > 0)}");
-            //Console.WriteLine($"Somme des centrales dans la liste : {res.Count()}");
 
             return allPossibleCombinations
                 .OrderBy(combination =>

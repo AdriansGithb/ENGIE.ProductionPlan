@@ -13,6 +13,8 @@ namespace ProductionPlan.Core.Mappers
     {
         public static PowerGenerationUnit ToWindPowerGenerationUnit(this Powerplant powerplant, decimal wind)
         {
+            if (powerplant.Type != PowerplantTypeEnum.windturbine)
+                throw new ArgumentException("Cannot map to (wind)PowerGenerationUnit because powerplant type is not wind");
             return new PowerGenerationUnit
             {
                 Name = powerplant.Name,
@@ -26,6 +28,8 @@ namespace ProductionPlan.Core.Mappers
 
         public static PowerGenerationUnit ToFuelPowerGenerationUnit(this Powerplant powerplant, decimal fuelPricePerMwh, decimal co2Price)
         {
+            if (powerplant.Type == PowerplantTypeEnum.windturbine)
+                throw new ArgumentException("Cannot map to (fuel)PowerGenerationUnit because powerplant type is not a fuel type");
             return new PowerGenerationUnit
             {
                 Name = powerplant.Name,

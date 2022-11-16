@@ -23,12 +23,6 @@ namespace ProductionPlan.Core.Services
         {
             try
             {
-                if (payload.Powerplants is null || payload.Powerplants.Count() == 0)
-                {
-                    _logger.LogInformation("Return empty list because of empty powerplants list received");
-                    return new List<PlannedProductionPowerplant>();
-                }
-
                 var target = payload.Load;
 
                 var powerUnits = GetPowerGenerationUnits(payload);

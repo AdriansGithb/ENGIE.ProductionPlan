@@ -127,26 +127,6 @@ namespace ProductionPlan.Core.Test
         }
 
         [Fact]
-        public void PlanProduction_ShouldReturnAnEmptyList_IfPayloadPowerplantsListIsNullOrEmpty()
-        {
-            var payload = new Payload
-            {
-                Load = 10000,
-                Fuels = new Fuel
-                {
-                    Gas = 10,
-                    Kerosine = 20,
-                    Wind = 50,
-                    Co2 = 10
-                },
-                Powerplants = new List<Powerplant>(),
-            };
-
-            var result = _service.PlanProduction(payload);
-            Assert.Empty(result);
-        }
-
-        [Fact]
         public void PlanProduction_ShouldThrowAnException_IfLoadIsHigherThanMaximumProduction()
         {
             var payload = new Payload

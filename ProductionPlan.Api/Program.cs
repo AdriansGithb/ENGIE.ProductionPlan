@@ -1,5 +1,8 @@
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using NLog;
 using NLog.Web;
+using ProductionPlan.Api.Validators;
 using ProductionPlan.Core.Abstract;
 using ProductionPlan.Core.Services;
 using System;
@@ -14,7 +17,10 @@ try
 	// Add services to the container.
 	builder.Services.AddControllers();
 
-	builder.Services.AddScoped<IProductionService, ProductionService>();
+	builder.Services.AddValidatorsFromAssemblyContaining<PayloadValidator>();
+
+
+    builder.Services.AddScoped<IProductionService, ProductionService>();
 
 	// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 	builder.Services.AddEndpointsApiExplorer();

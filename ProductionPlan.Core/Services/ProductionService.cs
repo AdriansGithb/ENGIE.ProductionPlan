@@ -50,17 +50,17 @@ namespace ProductionPlan.Core.Services
                 //target load is equal to max producible power
                 else if( target == powerUnits.Sum(pu => pu.PMax))
                 {
-                    _logger.LogInformation("Target load is equal to maximum producible power");
+                    _logger.LogInformation("Target load is equal to maximum producible power : plan maximal production");
                     plannedProcutionList = PlanMaximalProduction(powerUnits).ToList();
                 }
                 //target load is less than max producible power
                 else
                 {
-                    _logger.LogInformation("Target load is less than maximum producible power");
+                    _logger.LogInformation("Target load is less than maximum producible power : plan production by merit order");
                     plannedProcutionList = PlanProductionByMeritOrder(powerUnits, target).ToList();
                 }
 
-                if (plannedProcutionList is null || plannedProcutionList.Count == 0)
+                if(plannedProcutionList is null || plannedProcutionList.Count == 0)
                 {
                     //_logger.LogError("Planned production list is empty");
                     throw new ArgumentException("Planned production list is empty");
@@ -88,7 +88,7 @@ namespace ProductionPlan.Core.Services
         }
 
 
-        private IEnumerable<PlannedProductionPowerplant> PlanProductionByMeritOrder(List<PowerGenerationUnit> powerGenerationUnits, decimal target)
+        public IEnumerable<PlannedProductionPowerplant> PlanProductionByMeritOrder(List<PowerGenerationUnit> powerGenerationUnits, decimal target)
         {
             //sort list by merit order 
             powerGenerationUnits = powerGenerationUnits
@@ -117,7 +117,7 @@ namespace ProductionPlan.Core.Services
             return powerGenerationUnits.Select(pu => pu.ToPlannedProductionPowerplant());
 
         }
-        private IEnumerable<PlannedProductionPowerplant> PlanMaximalProduction(List<PowerGenerationUnit> powerGenerationUnits)
+        public IEnumerable<PlannedProductionPowerplant> PlanMaximalProduction(List<PowerGenerationUnit> powerGenerationUnits)
         {
             List<PlannedProductionPowerplant> plannedProcutionList = new List<PlannedProductionPowerplant>();
             foreach (var unit in powerGenerationUnits)
@@ -127,7 +127,7 @@ namespace ProductionPlan.Core.Services
             }
             return plannedProcutionList;
         }
-        private List<PowerGenerationUnit> GetPowerGenerationUnits(Payload payload)
+        public List<PowerGenerationUnit> GetPowerGenerationUnits(Payload payload)
         {
             List<PowerGenerationUnit> units = new List<PowerGenerationUnit>();
             foreach(var pwp in payload.Powerplants)
@@ -144,7 +144,7 @@ namespace ProductionPlan.Core.Services
             return units;
         }
 
-        private IEnumerable<IEnumerable<PowerGenerationUnit>> GetAllPossibleCombinations(IEnumerable<PowerGenerationUnit> availablePowerUnits)
+        public IEnumerable<IEnumerable<PowerGenerationUnit>> GetAllPossibleCombinations(IEnumerable<PowerGenerationUnit> availablePowerUnits)
         {
             if (!availablePowerUnits.Any())
                 return Enumerable.Repeat(Enumerable.Empty<PowerGenerationUnit>(), 1);
@@ -155,7 +155,7 @@ namespace ProductionPlan.Core.Services
             return possibleUnitsCombination.Concat(nextUnits) ;
         }
 
-        private List<PowerGenerationUnit> GetBestPossibleCombination(List<List<PowerGenerationUnit>> allPossibleCombinations, decimal target)
+        public List<PowerGenerationUnit> GetBestPossibleCombination(List<List<PowerGenerationUnit>> allPossibleCombinations, decimal target)
         {
             foreach (var combination in allPossibleCombinations)
             {

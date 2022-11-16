@@ -53,7 +53,7 @@ namespace ProductionPlan.Api.Controllers
                 _logger.LogError($"Controller response catched an exception : {ex.Message}");
                 var actionResponse = ex.Message switch
                 {
-                    "Received load is less than zero" => BadRequest(ex.Message),
+                    //"Received load is less than zero" => BadRequest(ex.Message),
                     "Target load is higher than maximum producible power" => BadRequest(ex.Message),
                     _ => StatusCode(StatusCodes.Status500InternalServerError, ex),
                 };

@@ -33,11 +33,11 @@ namespace ProductionPlan.Core.Services
                 }
 
                 var target = payload.Load;
-                if(target < 0)
-                {
-                    //_logger.LogError("Received load is less than 0.");
-                     throw new ArgumentException("Received load is less than zero");
-               }
+               // if(target < 0)
+               // {
+               //     //_logger.LogError("Received load is less than 0.");
+               //      throw new ArgumentException("Received load is less than zero");
+               //}
 
                 var powerUnits = GetPowerGenerationUnits(payload);
                 List<PlannedProductionPowerplant> plannedProcutionList = new List<PlannedProductionPowerplant>();

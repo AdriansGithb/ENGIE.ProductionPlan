@@ -25,11 +25,21 @@ namespace ProductionPlan.Api.Controllers
             try
             {
                 _logger.LogInformation("Post payload reached!");
-                return Ok(_productionService.PlanProduction(payload));
+                var proposedProductionPlan = _productionService.PlanProduction(payload);
+                _logger.LogInformation($"Controller sent a valid production plan : received load '{payload.Load}' - received powerplants count '{payload.Powerplants.Count()}' // sent load '{proposedProductionPlan.Sum(pwp => pwp.P)}' - sent powerplants count '{proposedProductionPlan.Count()}'");
+                return Ok(proposedProductionPlan);
             }
             catch (Exception ex)
             {
-                throw new NotImplementedException();
+                _logger.LogError($"Controller response catched an exception : {ex.Message}");
+                var actionResponse = ex.Message switch
+                {
+                    "Received load is less than zero" => BadRequest(ex.Message),
+                    "Target load is higher than maximum producible power" => BadRequest(ex.Message),
+                    _ => StatusCode(StatusCodes.Status500InternalServerError, ex),
+                };
+                _logger.LogInformation($"Controller error response is : {actionResponse.StatusCode} - {actionResponse.Value}");
+                return actionResponse;
             }
         }
     }

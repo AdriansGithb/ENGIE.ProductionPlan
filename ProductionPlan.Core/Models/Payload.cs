@@ -9,7 +9,7 @@ namespace ProductionPlan.Core.Models
 {
     public class Payload
     {
-        public float Load { get; set; }
+        public decimal Load { get; set; }
         public Fuel Fuels { get; set; }
         public IEnumerable<Powerplant> Powerplants { get; set; }
     }

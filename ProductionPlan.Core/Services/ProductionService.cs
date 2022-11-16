@@ -6,6 +6,7 @@ using ProductionPlan.Core.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,39 +32,58 @@ namespace ProductionPlan.Core.Services
                     return new List<PlannedProductionPowerplant>();
                 }
 
-                var target = (decimal)payload.Load;
+                var target = payload.Load;
                 if(target < 0)
                 {
-                    _logger.LogError("Received load is less than 0.");
-                     throw new ArgumentException("Payload is less than zero.");
+                    //_logger.LogError("Received load is less than 0.");
+                     throw new ArgumentException("Received load is less than zero");
                }
 
                 var powerUnits = GetPowerGenerationUnits(payload);
-
+                List<PlannedProductionPowerplant> plannedProcutionList = new List<PlannedProductionPowerplant>();
                 // target load is higher than max producible power
                 if( target > powerUnits.Sum(pu => pu.PMax))
                 {
-                    _logger.LogError("Target load is higher than maximum producible power");
-                    return PlanMaximalProduction(powerUnits);
+                    //_logger.LogError("Target load is higher than maximum producible power");
+                    throw new ArgumentException("Target load is higher than maximum producible power");
                 }
                 //target load is equal to max producible power
                 else if( target == powerUnits.Sum(pu => pu.PMax))
                 {
                     _logger.LogInformation("Target load is equal to maximum producible power");
-                    return PlanMaximalProduction(powerUnits);
+                    plannedProcutionList = PlanMaximalProduction(powerUnits).ToList();
                 }
                 //target load is less than max producible power
                 else
                 {
                     _logger.LogInformation("Target load is less than maximum producible power");
-                    return PlanProductionByMeritOrder(powerUnits, target);
+                    plannedProcutionList = PlanProductionByMeritOrder(powerUnits, target).ToList();
                 }
-                
+
+                if (plannedProcutionList is null || plannedProcutionList.Count == 0)
+                {
+                    //_logger.LogError("Planned production list is empty");
+                    throw new ArgumentException("Planned production list is empty");
+                }
+                if(plannedProcutionList.Sum(pwplnt => pwplnt.P) != target)
+                {
+                    //_logger.LogError("Planned total amount of power to produce is not equal to expected load");
+                    throw new ArgumentException("Planned total amount of power to produce is not equal to expected load");
+                }
+                if(plannedProcutionList.Count != payload.Powerplants.Count())
+                {
+                    //_logger.LogError("Powerplants count in Planned production list is not equal to powerplants count in received Payload");
+                    throw new ArgumentException("Powerplants count in Planned production list is not equal to powerplants count in received Payload");
+                }
+
+                return plannedProcutionList;
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
-                throw ex;
+                ExceptionDispatchInfo.Capture(ex).Throw();
+                throw;
             }
         }
 
@@ -144,7 +164,6 @@ namespace ProductionPlan.Core.Services
                 var tempTarget = target;
                 foreach(var powerUnit in combination)
                 {
-                    //minMandatory -= Math.Round(powerUnit.PMin, 1, MidpointRounding.ToZero);
                     minMandatory -= powerUnit.PMin;
                     decimal residue = tempTarget - minMandatory;
                     decimal powerToUse = 0;

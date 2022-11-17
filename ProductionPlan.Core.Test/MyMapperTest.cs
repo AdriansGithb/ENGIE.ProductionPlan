@@ -22,7 +22,7 @@ namespace ProductionPlan.Core.Test
             {
                 Name = "powerplantName",
                 Type = PowerplantTypeEnum.windturbine,
-                Efficiency = 0.5M,
+                Efficiency = 1,
                 PMin = 10,
                 PMax = 15,
             };
@@ -33,8 +33,8 @@ namespace ProductionPlan.Core.Test
             Assert.Equal(powerplant.Name, res.Name);
             Assert.Equal(powerplant.Type, res.Type);
             Assert.Equal(powerplant.Efficiency, res.Efficiency);
-            Assert.Equal(2.5M, res.PMin );
-            Assert.Equal(3.7M, res.PMax );
+            Assert.Equal(7.5M, res.PMin );
+            Assert.Equal(7.5M, res.PMax );
             Assert.Equal(0, res.ProductionCostPerMwh );
         }
 

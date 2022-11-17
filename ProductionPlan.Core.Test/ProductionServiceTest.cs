@@ -25,7 +25,7 @@ namespace ProductionPlan.Core.Test
         {
             var payload = new Payload
             {
-                Load = 130,
+                Load = 150,
                 Fuels = new Fuel
                 {
                     Gas = 13.4M,
@@ -73,7 +73,7 @@ namespace ProductionPlan.Core.Test
             var result = _service.PlanProduction(payload);
 
             Assert.NotEmpty(result);
-            Assert.Equal(130, result.ElementAt(0).P);
+            Assert.Equal(150, result.First(r => r.Name == "windturbine2").P);
 
         }
 

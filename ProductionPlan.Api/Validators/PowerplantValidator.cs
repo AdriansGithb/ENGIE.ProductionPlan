@@ -11,7 +11,7 @@ namespace ProductionPlan.Api.Validators
             RuleFor(p => p.Type).NotNull();
             RuleFor(p => p.Efficiency).NotNull().GreaterThanOrEqualTo(0).LessThanOrEqualTo(100).WithMessage("Value of property Efficiency must be between 0 and 100");
             RuleFor(p => p.PMin).NotNull().GreaterThanOrEqualTo(0);
-            RuleFor(p => p.PMax).NotNull().GreaterThanOrEqualTo(0);
+            RuleFor(p => p.PMax).NotNull().GreaterThanOrEqualTo(p => p.PMin).WithMessage("Powerplant PMax must be greater or equal to PMin");
         }
     }
 }

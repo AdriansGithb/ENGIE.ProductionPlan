@@ -39,6 +39,7 @@ namespace ProductionPlan.Core.Services
                     #endregion
                     plannedProcutionList = PlanMaximalProduction(powerUnits).ToList();
                 }
+
                 //target load is less than max producible power
                 else
                 {

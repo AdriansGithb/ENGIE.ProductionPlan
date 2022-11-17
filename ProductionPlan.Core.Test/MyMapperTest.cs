@@ -74,8 +74,8 @@ namespace ProductionPlan.Core.Test
             Assert.Equal(powerplant.Name, res.Name);
             Assert.Equal(powerplant.Type, res.Type);
             Assert.Equal(powerplant.Efficiency, res.Efficiency);
-            Assert.Equal(5M, res.PMin );
-            Assert.Equal(7.5M, res.PMax );
+            Assert.Equal(10, res.PMin );
+            Assert.Equal(15, res.PMax );
             Assert.Equal(103, res.ProductionCostPerMwh );
         }
 
@@ -98,8 +98,8 @@ namespace ProductionPlan.Core.Test
             Assert.Equal(powerplant.Name, res.Name);
             Assert.Equal(powerplant.Type, res.Type);
             Assert.Equal(powerplant.Efficiency, res.Efficiency);
-            Assert.Equal(5M, res.PMin );
-            Assert.Equal(7.5M, res.PMax );
+            Assert.Equal(10, res.PMin );
+            Assert.Equal(15, res.PMax );
             Assert.Equal(100, res.ProductionCostPerMwh );
         }
 

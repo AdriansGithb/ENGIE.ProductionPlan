@@ -62,6 +62,7 @@ namespace ProductionPlan.Api.Controllers
                 var actionResponse = ex.Message switch
                 {
                     "Target load is higher than maximum producible power" => BadRequest(ex.Message),
+                    "Target load is less than minimum producible power" => BadRequest(ex.Message),
                     _ => StatusCode(StatusCodes.Status500InternalServerError, ex),
                 };
                 #region log

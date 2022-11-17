@@ -9,13 +9,16 @@ namespace ProductionPlan.Core.Mappers
         {
             if (powerplant.Type != PowerplantTypeEnum.windturbine)
                 throw new ArgumentException("Cannot map to (wind)PowerGenerationUnit because powerplant type is not wind");
+
+            decimal p = Math.Round(powerplant.PMax * powerplant.Efficiency * (wind / 100), 1, MidpointRounding.ToZero);
+
             return new PowerGenerationUnit
             {
                 Name = powerplant.Name,
                 Type = powerplant.Type,
                 Efficiency = powerplant.Efficiency,
-                PMin = Math.Round(powerplant.PMin * powerplant.Efficiency * (wind / 100), 1, MidpointRounding.ToZero),
-                PMax = Math.Round(powerplant.PMax * powerplant.Efficiency * (wind / 100), 1, MidpointRounding.ToZero),
+                PMin = p,
+                PMax = p,
                 ProductionCostPerMwh = 0
             };
         }

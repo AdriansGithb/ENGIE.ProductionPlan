@@ -31,6 +31,10 @@ namespace ProductionPlan.Core.Services
                 if( target > powerUnits.Sum(pu => pu.PMax))
                     throw new ArgumentException("Target load is higher than maximum producible power");
 
+                // target load is less than each min producible power
+                else if( target < powerUnits.Min(pu => pu.PMin))
+                    throw new ArgumentException("Target load is less than minimum producible power");
+
                 //target load is equal to max producible power
                 else if( target == powerUnits.Sum(pu => pu.PMax))
                 {
@@ -75,6 +79,7 @@ namespace ProductionPlan.Core.Services
             //sort list by merit order 
             powerGenerationUnits = powerGenerationUnits
                 .OrderBy(item => item.ProductionCostPerMwh).ThenBy(item => item.PMin).ThenByDescending(item => item.PMax).ToList();
+
             //get full possible combinations list and do not take power units with 0 producible power
             var possibleCombinations = (from combination in GetAllPossibleCombinations(powerGenerationUnits.Where(pu => pu.PMax > 0))
                           where combination.Sum(c => c.PMax) >= target && combination.Sum(c => c.PMin) <= target

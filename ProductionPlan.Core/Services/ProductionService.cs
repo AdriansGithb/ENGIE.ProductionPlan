@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using ProductionPlan.Core.Abstract;
+using ProductionPlan.Core.Constants;
 using ProductionPlan.Core.Mappers;
 using ProductionPlan.Core.Models;
 using ProductionPlan.Core.Models.Enums;
@@ -29,11 +30,11 @@ namespace ProductionPlan.Core.Services
                 List<PlannedProductionPowerplant> plannedProcutionList = new List<PlannedProductionPowerplant>();
                 // target load is higher than max producible power
                 if( target > powerUnits.Sum(pu => pu.PMax))
-                    throw new ArgumentException("Target load is higher than maximum producible power");
+                    throw new ArgumentException(ExceptionMessageConstants.LoadTooHigh);
 
                 // target load is less than each min producible power
                 else if( target < powerUnits.Min(pu => pu.PMin))
-                    throw new ArgumentException("Target load is less than minimum producible power");
+                    throw new ArgumentException(ExceptionMessageConstants.LoadTooLow);
 
                 //target load is equal to max producible power
                 else if( target == powerUnits.Sum(pu => pu.PMax))
@@ -84,16 +85,6 @@ namespace ProductionPlan.Core.Services
             var possibleCombinations = (from combination in GetAllPossibleCombinations(powerGenerationUnits.Where(pu => pu.PMax > 0))
                           where combination.Sum(c => c.PMax) >= target && combination.Sum(c => c.PMin) <= target
                           select combination.ToList()).ToList();
-
-            //clone objects
-            for (int i = 0; i < possibleCombinations.Count; i++)
-            {
-                for (int j = 0; j < possibleCombinations[i].Count; j++)
-                {
-                    var clone = possibleCombinations[i][j].DeepCopy();
-                    possibleCombinations[i][j] = clone;
-                }
-            }
 
             var bestPowerGeneration = GetBestPossibleCombination(possibleCombinations, target).ToList();
             foreach(var powerGenerationUnit in powerGenerationUnits)
@@ -150,11 +141,11 @@ namespace ProductionPlan.Core.Services
         {
             foreach (var combination in allPossibleCombinations)
             {
-                var possibleCombination = new List<PowerGenerationUnit>();
                 var minMandatory = combination.Sum(x => x.PMin);
                 var tempTarget = target;
-                foreach(var powerUnit in combination)
+                for (int j = 0; j < combination.Count; j++)
                 {
+                    var powerUnit = combination[j].DeepCopy();
                     minMandatory -= powerUnit.PMin;
                     decimal residue = tempTarget - minMandatory;
                     decimal powerToUse = 0;
@@ -165,6 +156,7 @@ namespace ProductionPlan.Core.Services
 
                     powerUnit.AdvisedProduction = powerToUse;
                     tempTarget -= powerToUse;
+                    combination[j] = powerUnit;
                 }
             }
 

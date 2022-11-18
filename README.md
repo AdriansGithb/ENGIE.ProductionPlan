@@ -32,7 +32,7 @@ The API is containerized in a Windows Docker container. You can build and run it
     > Note that _productionplancontainer_ is the name of the container, you can modify it by any other name you prefer. Just keep in mind to use lower case only
 
 ## Test the API
-Once the +API is running, you can test it :
+Once the API is running, you can test it :
 * __with swagger interface__ _(if enabled like explained above)_ :
   * open your browser and navigate to http://localhost:8888/swagger/index.html
   * try to POST any payload object you want

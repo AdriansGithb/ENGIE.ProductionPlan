@@ -26,6 +26,9 @@ namespace ProductionPlan.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<PlannedProductionPowerplant>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult Post([FromBody]Payload payload)
         {
             try

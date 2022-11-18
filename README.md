@@ -17,7 +17,7 @@ The API is containerized in a Windows Docker container. You can build and run it
   * If it is on _Linux containers mode_, right-click the System Tray's Docker client icon and select `switch to Windows containers`
 * Open a _Windows Command Prompt_ window
 * Change the directory to your local solution root folder : ` $\ENGIE.ProductionPlan-master\ `
-* __Build the container running this command__ : `docker build -t productionplanapp \ProductionPlan.Api`
+* __Build the container running this command__ : `docker build -t productionplanapp .`
   > Note that _productionplanapp_ is the name of the image, you can modify it by any other name you prefer. Just keep in mind to use your custom name instead of _productionplanapp_ for further commands, and to use lower case only
 * __Run the container__ :
   * in Development mode __with swagger interface__ : `docker run --rm -dp 8888:80 -e "ASPNETCORE_ENVIRONMENT=Development" --name productionplancontainer productionplanapp`

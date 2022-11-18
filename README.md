@@ -1,7 +1,7 @@
 # ProductionPlan
 
 ## Welcome :)
-Hi, I'm Adrian Vanhoeke, Junior .Net Developper at Satellit, and welcome to my Powerplant-coding-challenge solution.
+Hi, I'm Adrian Vanhoeke, .Net Developper at Satellit, and welcome to my Powerplant-coding-challenge solution.
 You will find all my source code in this repo, and the installation and run processes explained here below.
 
 ## Cloud or Local cloned source code

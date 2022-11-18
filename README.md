@@ -20,15 +20,15 @@ The API is containerized in a Windows Docker container. You can build and run it
 * __Build the container running this command__ : `docker build -t productionplanapp .`
   > Note that _productionplanapp_ is the name of the image, you can modify it by any other name you prefer. Just keep in mind to use your custom name instead of _productionplanapp_ for further commands, and to use lower case only
 * __Run the container__ :
-  * in Development mode __with swagger interface__ : `docker run --rm -dp 8888:80 -e "ASPNETCORE_ENVIRONMENT=Development" --name productionplancontainer productionplanapp`
-  * in default mode __without swagger interface__ : `docker run --rm -dp 8888:80 --name productionplancontainer productionplanapp`
+  * __with swagger interface__ _(Development mode)_ : `docker run --rm -dp 8888:80 -e "ASPNETCORE_ENVIRONMENT=Development" --name productionplancontainer productionplanapp`
+  * __without swagger interface__ : `docker run --rm -dp 8888:80 --name productionplancontainer productionplanapp`
 ### Based on this (cloud) github repo
 * __Build the container running this command__ : `docker build -t productionplanapp https://github.com/AdriansGithb/ENGIE.ProductionPlan.git`
   > Note that _productionplanapp_ is the name of the image, you can modify it by any other name you prefer. Just keep in mind to use your custom name instead of _productionplanapp_ for further commands, and to use lower case only
 * __Run the container__ :
-  * in Development mode __with swagger interface__ : `docker run --rm -dp 8888:80 -e "ASPNETCORE_ENVIRONMENT=Development" --name productionplancontainer productionplanapp`
+  * __with swagger interface__ _(Development mode)_ : `docker run --rm -dp 8888:80 -e "ASPNETCORE_ENVIRONMENT=Development" --name productionplancontainer productionplanapp`
     > Note that _productionplancontainer_ is the name of the container, you can modify it by any other name you prefer. Just keep in mind to use lower case only
-  * in default mode __without swagger interface__ : `docker run --rm -dp 8888:80 --name productionplancontainer productionplanapp`
+  * __without swagger interface__ : `docker run --rm -dp 8888:80 --name productionplancontainer productionplanapp`
     > Note that _productionplancontainer_ is the name of the container, you can modify it by any other name you prefer. Just keep in mind to use lower case only
 
 ## Test the API

@@ -34,8 +34,8 @@ The API is containerized in a Windows Docker container. You can build and run it
 ## Test the API
 Once the +API is running, you can test it :
 * __with swagger interface__ _(if enabled like explained above)_ :
-  * open your browser and navigate to `http://localhost:8888/swagger/index.html`
+  * open your browser and navigate to http://localhost:8888/swagger/index.html
   * try to POST any payload object you want
 * __without swagger interface__ : 
   * open _Postman_ (or any other API testing app)
-  * try to POST any payload object you want to this address `http://localhost:8888/api/ProductionPlan`
+  * try to POST any payload object you want to this address http://localhost:8888/api/ProductionPlan

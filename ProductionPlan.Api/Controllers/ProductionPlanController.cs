@@ -2,6 +2,7 @@
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using ProductionPlan.Core.Abstract;
+using ProductionPlan.Core.Constants;
 using ProductionPlan.Core.Models;
 using System.Text;
 
@@ -64,8 +65,8 @@ namespace ProductionPlan.Api.Controllers
                 #endregion
                 var actionResponse = ex.Message switch
                 {
-                    "Target load is higher than maximum producible power" => BadRequest(ex.Message),
-                    "Target load is less than minimum producible power" => BadRequest(ex.Message),
+                    ExceptionMessageConstants.LoadTooHigh => BadRequest(ex.Message),
+                    ExceptionMessageConstants.LoadTooLow => BadRequest(ex.Message),
                     _ => StatusCode(StatusCodes.Status500InternalServerError, ex),
                 };
                 #region log

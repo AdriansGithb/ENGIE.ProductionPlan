@@ -1,7 +1,7 @@
 # ProductionPlan
 
 ## Welcome :)
-Hi, I'm Adrian Vanhoeke, Junior .Net Developper at Satellit, and welcome to my Powerplant-coding-challenge solution.
+Hi, I'm Adrian Vanhoeke, .Net Developper at Satellit, and welcome to my Powerplant-coding-challenge solution.
 You will find all my source code in this repo, and the installation and run processes explained here below.
 
 ## Cloud or Local cloned source code
@@ -17,25 +17,25 @@ The API is containerized in a Windows Docker container. You can build and run it
   * If it is on _Linux containers mode_, right-click the System Tray's Docker client icon and select `switch to Windows containers`
 * Open a _Windows Command Prompt_ window
 * Change the directory to your local solution root folder : ` $\ENGIE.ProductionPlan-master\ `
-* __Build the container running this command__ : `docker build -t productionplanapp \ProductionPlan.Api`
+* __Build the container running this command__ : `docker build -t productionplanapp .`
   > Note that _productionplanapp_ is the name of the image, you can modify it by any other name you prefer. Just keep in mind to use your custom name instead of _productionplanapp_ for further commands, and to use lower case only
 * __Run the container__ :
-  * in Development mode __with swagger interface__ : `docker run --rm -dp 8888:80 -e "ASPNETCORE_ENVIRONMENT=Development" --name productionplancontainer productionplanapp`
-  * in default mode __without swagger interface__ : `docker run --rm -dp 8888:80 --name productionplancontainer productionplanapp`
+  * __with swagger interface__ _(Development mode)_ : `docker run --rm -dp 8888:80 -e "ASPNETCORE_ENVIRONMENT=Development" --name productionplancontainer productionplanapp`
+  * __without swagger interface__ : `docker run --rm -dp 8888:80 --name productionplancontainer productionplanapp`
 ### Based on this (cloud) github repo
 * __Build the container running this command__ : `docker build -t productionplanapp https://github.com/AdriansGithb/ENGIE.ProductionPlan.git`
   > Note that _productionplanapp_ is the name of the image, you can modify it by any other name you prefer. Just keep in mind to use your custom name instead of _productionplanapp_ for further commands, and to use lower case only
 * __Run the container__ :
-  * in Development mode __with swagger interface__ : `docker run --rm -dp 8888:80 -e "ASPNETCORE_ENVIRONMENT=Development" --name productionplancontainer productionplanapp`
+  * __with swagger interface__ _(Development mode)_ : `docker run --rm -dp 8888:80 -e "ASPNETCORE_ENVIRONMENT=Development" --name productionplancontainer productionplanapp`
     > Note that _productionplancontainer_ is the name of the container, you can modify it by any other name you prefer. Just keep in mind to use lower case only
-  * in default mode __without swagger interface__ : `docker run --rm -dp 8888:80 --name productionplancontainer productionplanapp`
+  * __without swagger interface__ : `docker run --rm -dp 8888:80 --name productionplancontainer productionplanapp`
     > Note that _productionplancontainer_ is the name of the container, you can modify it by any other name you prefer. Just keep in mind to use lower case only
 
 ## Test the API
-Once the +API is running, you can test it :
+Once the API is running, you can test it :
 * __with swagger interface__ _(if enabled like explained above)_ :
-  * open your browser and navigate to `http://localhost:8888/swagger/index.html`
+  * open your browser and navigate to http://localhost:8888/swagger/index.html
   * try to POST any payload object you want
 * __without swagger interface__ : 
   * open _Postman_ (or any other API testing app)
-  * try to POST any payload object you want to this address `http://localhost:8888/api/ProductionPlan`
+  * try to POST any payload object you want to this address http://localhost:8888/api/ProductionPlan

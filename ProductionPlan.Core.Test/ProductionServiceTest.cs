@@ -28,10 +28,10 @@ namespace ProductionPlan.Core.Test
                 Load = 150,
                 Fuels = new Fuel
                 {
-                    Gas = 13.4M,
-                    Kerosine = 50.8M,
-                    Wind = 100,
-                    Co2 = 20
+                    GasCostPerMwh = 13.4M,
+                    KerosineCostPerMwh = 50.8M,
+                    WindEfficiency = 100,
+                    Co2CostPerTon = 20
                 },
                 Powerplants = new List<Powerplant>
                 {
@@ -85,10 +85,10 @@ namespace ProductionPlan.Core.Test
                 Load = 600,
                 Fuels = new Fuel
                 {
-                    Gas = 10,
-                    Kerosine = 20,
-                    Wind = 100,
-                    Co2 = 10
+                    GasCostPerMwh = 10,
+                    KerosineCostPerMwh = 20,
+                    WindEfficiency = 100,
+                    Co2CostPerTon = 10
                 },
                 Powerplants = new List<Powerplant>
                 {
@@ -134,10 +134,10 @@ namespace ProductionPlan.Core.Test
                 Load = 10000,
                 Fuels = new Fuel
                 {
-                    Gas = 10,
-                    Kerosine = 20,
-                    Wind = 50,
-                    Co2 = 10
+                    GasCostPerMwh = 10,
+                    KerosineCostPerMwh = 20,
+                    WindEfficiency = 50,
+                    Co2CostPerTon = 10
                 },
                 Powerplants = new List<Powerplant>
                 {
@@ -227,10 +227,10 @@ namespace ProductionPlan.Core.Test
                 Load = It.IsAny<decimal>(),
                 Fuels = new Fuel
                 {
-                    Gas = 10,
-                    Kerosine = 20,
-                    Wind = 50,
-                    Co2 = 10
+                    GasCostPerMwh = 10,
+                    KerosineCostPerMwh = 20,
+                    WindEfficiency = 50,
+                    Co2CostPerTon = 10
                 },
                 Powerplants = new List<Powerplant>
                 {

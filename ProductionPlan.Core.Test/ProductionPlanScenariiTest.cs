@@ -19,7 +19,7 @@ namespace ProductionPlan.Core.Test
         {
             var logger = new Mock<ILogger<ProductionService>>();
             _service = new ProductionService(logger.Object);
-            _baseEnergyMetrics = new Fuel() { Co2 = 20, Kerosine = 50, Gas = 15, Wind = 50 };
+            _baseEnergyMetrics = new Fuel() { Co2CostPerTon = 20, KerosineCostPerMwh = 50, GasCostPerMwh = 15, WindEfficiency = 50 };
 
         }
 
@@ -232,7 +232,7 @@ namespace ProductionPlan.Core.Test
         [Fact]
         public void PlanProduction_TrickyTest1()
         {
-            Fuel energyMetrics = new Fuel { Co2 = 0, Kerosine = 50.8M, Gas = 20, Wind = 100 };
+            Fuel energyMetrics = new Fuel { Co2CostPerTon = 0, KerosineCostPerMwh = 50.8M, GasCostPerMwh = 20, WindEfficiency = 100 };
             Payload productionPlan = new Payload
             {
                 Load = 60,
@@ -256,7 +256,7 @@ namespace ProductionPlan.Core.Test
         [Fact]
         public void PlanProduction_TrickyTest2()
         {
-            Fuel energyMetrics = new Fuel { Co2 = 0, Kerosine = 50.8M, Gas = 20, Wind = 100 };
+            Fuel energyMetrics = new Fuel { Co2CostPerTon = 0, KerosineCostPerMwh = 50.8M, GasCostPerMwh = 20, WindEfficiency = 100 };
             Payload productionPlan = new Payload
             {
                 Load = 80,
@@ -280,7 +280,7 @@ namespace ProductionPlan.Core.Test
         [Fact]
         public void PlanProduction_ExamplePayload1_NoCO2()
         {
-            Fuel energyMetrics = new Fuel{ Co2 = 0, Kerosine = 50.8M, Gas = 13.4M, Wind = 60 };
+            Fuel energyMetrics = new Fuel{ Co2CostPerTon = 0, KerosineCostPerMwh = 50.8M, GasCostPerMwh = 13.4M, WindEfficiency = 60 };
             Payload productionPlan = new Payload
             {
                 Load = 480,
@@ -310,7 +310,7 @@ namespace ProductionPlan.Core.Test
         [Fact]
         public void PlanProduction_ExamplePayload2_NoCO2()
         {
-            Fuel energyMetrics = new Fuel{ Co2 = 0, Kerosine = 50.8M, Gas = 13.4M, Wind = 0 };
+            Fuel energyMetrics = new Fuel{ Co2CostPerTon = 0, KerosineCostPerMwh = 50.8M, GasCostPerMwh = 13.4M, WindEfficiency = 0 };
             Payload productionPlan = new Payload
             {
                 Load = 480,
@@ -340,7 +340,7 @@ namespace ProductionPlan.Core.Test
         [Fact]
         public void PlanProduction_ExamplePayload3_NoCO2()
         {
-            Fuel energyMetrics = new Fuel{ Co2 = 0, Kerosine = 50.8M, Gas = 13.4M, Wind = 60 };
+            Fuel energyMetrics = new Fuel{ Co2CostPerTon = 0, KerosineCostPerMwh = 50.8M, GasCostPerMwh = 13.4M, WindEfficiency = 60 };
             Payload productionPlan = new Payload
             {
                 Load = 910,
@@ -370,7 +370,7 @@ namespace ProductionPlan.Core.Test
         [Fact]
         public void PlanProduction_ExamplePayload1_WithCO2()
         {
-            Fuel energyMetrics = new Fuel{ Co2 = 20, Kerosine = 50.8M, Gas = 13.4M, Wind = 60 };
+            Fuel energyMetrics = new Fuel{ Co2CostPerTon = 20, KerosineCostPerMwh = 50.8M, GasCostPerMwh = 13.4M, WindEfficiency = 60 };
             Payload productionPlan = new Payload
             {
                 Load = 480,
@@ -400,7 +400,7 @@ namespace ProductionPlan.Core.Test
         [Fact]
         public void PlanProduction_ExamplePayload2_WithCO2()
         {
-            Fuel energyMetrics = new Fuel{ Co2 = 20, Kerosine = 50.8M, Gas = 13.4M, Wind = 0 };
+            Fuel energyMetrics = new Fuel{ Co2CostPerTon = 20, KerosineCostPerMwh = 50.8M, GasCostPerMwh = 13.4M, WindEfficiency = 0 };
             Payload productionPlan = new Payload
             {
                 Load = 480,
@@ -430,7 +430,7 @@ namespace ProductionPlan.Core.Test
         [Fact]
         public void PlanProduction_ExamplePayload3_WithCO2()
         {
-            Fuel energyMetrics = new Fuel{ Co2 = 20, Kerosine = 50.8M, Gas = 13.4M, Wind = 60 };
+            Fuel energyMetrics = new Fuel{ Co2CostPerTon = 20, KerosineCostPerMwh = 50.8M, GasCostPerMwh = 13.4M, WindEfficiency = 60 };
             Payload productionPlan = new Payload
             {
                 Load = 910,
@@ -455,6 +455,30 @@ namespace ProductionPlan.Core.Test
             Assert.Equal(338.4M, result.First(x => x.Name == "gasfiredbig2").P);
             Assert.Equal(0, result.First(x => x.Name == "gasfiredsomewhatsmaller").P);
             Assert.Equal(0, result.First(x => x.Name == "tj1").P);
+        }
+
+        [Fact]
+        public void PlanProduction_MostTrickyTest()
+        {
+            Fuel energyMetrics = new Fuel{ Co2CostPerTon = 0, KerosineCostPerMwh = 50.8M, GasCostPerMwh = 20M, WindEfficiency = 100 };
+            Payload productionPlan = new Payload
+            {
+                Load = 60,
+                Fuels = energyMetrics,
+                Powerplants = new List<Powerplant>
+                {
+                    new Powerplant{ Name = "wind", Type = PowerplantTypeEnum.windturbine , Efficiency = 1, PMin = 0, PMax = 20 },
+                    new Powerplant{ Name = "gasfiredbig1", Type = PowerplantTypeEnum.gasfired , Efficiency = 0.9M, PMin = 50, PMax = 100 },
+                    new Powerplant{ Name = "inefficient", Type = PowerplantTypeEnum.gasfired , Efficiency = 0.1M, PMin = 0, PMax = 100 },                
+                }
+            };
+
+            var result = _service.PlanProduction(productionPlan).ToList();
+
+            Assert.Equal(60, result.Select(x => x.P).Sum());
+            Assert.Equal(0, result.First(x => x.Name == "wind").P);
+            Assert.Equal(60, result.First(x => x.Name == "gasfiredbig1").P);
+            Assert.Equal(0, result.First(x => x.Name == "inefficient").P);
         }
 
     }

@@ -3,15 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ProductionPlan.Core.Models
 {
     public class Fuel
     {
-        public decimal Gas { get; set; }
-        public decimal Kerosine { get; set; }
-        public decimal Co2 { get; set; }
-        public decimal Wind { get; set; }
+        [JsonPropertyName(@"gas(euro/MWh)")]
+        public decimal GasCostPerMwh { get; set; }
+        [JsonPropertyName(@"kerosine(euro/MWh)")]
+        public decimal KerosineCostPerMwh { get; set; }
+        [JsonPropertyName(@"co2(euro/ton)")]
+        public decimal Co2CostPerTon { get; set; }
+        [JsonPropertyName(@"wind(%)")]
+        public decimal WindEfficiency { get; set; }
     }
 }

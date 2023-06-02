@@ -116,9 +116,9 @@ namespace ProductionPlan.Core.Services
             {
                 var unit = pwp.Type switch
                 {
-                    PowerplantTypeEnum.windturbine => pwp.ToWindPowerGenerationUnit(payload.Fuels.Wind),
-                    PowerplantTypeEnum.gasfired => pwp.ToFuelPowerGenerationUnit(payload.Fuels.Gas, payload.Fuels.Co2),
-                    PowerplantTypeEnum.turbojet => pwp.ToFuelPowerGenerationUnit(payload.Fuels.Kerosine, payload.Fuels.Co2),
+                    PowerplantTypeEnum.windturbine => pwp.ToWindPowerGenerationUnit(payload.Fuels.WindEfficiency),
+                    PowerplantTypeEnum.gasfired => pwp.ToFuelPowerGenerationUnit(payload.Fuels.GasCostPerMwh, payload.Fuels.Co2CostPerTon),
+                    PowerplantTypeEnum.turbojet => pwp.ToFuelPowerGenerationUnit(payload.Fuels.KerosineCostPerMwh, payload.Fuels.Co2CostPerTon),
                     _ => throw new ArgumentException($"Powerplant type not configured : {pwp.Type}")
                 };
                 units.Add(unit);
